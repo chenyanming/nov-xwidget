@@ -32,17 +32,8 @@
 (require 'shr)
 (require 'xwidget)
 
-(defcustom nov-xwdiget-script (format "
-// Your CSS as text
-var title = `
-   hello
-`
-var meta = document.createElement(\"meta\")
-// meta.setAttribute('http-equiv', 'Content-Type' )
-// meta.setAttribute('content', 'text/html' )
-meta.setAttribute('charset', 'utf-8' )
-document.getElementsByTagName('head')[0].appendChild(meta);
-
+(defcustom nov-xwidget-script (format "
+console.log(\"Hello world\");
 " "")
   "Javascript scripts used to run in the epub file."
   :group 'nov-xwidget
@@ -239,7 +230,7 @@ document.getElementsByTagName('head')[0].appendChild(meta);
                                     (file-name-nondirectory native-path)))
          ;; get full path of the final html file
          (output-native-path (expand-file-name output-native-file-name (file-name-directory native-path)))
-         ;; create the html if not esists, insert the `nov-xwdiget-script' as the html script
+         ;; create the html if not esists, insert the `nov-xwidget-script' as the html script
          (dom (with-temp-buffer
                  (insert-file-contents native-path)
                  (libxml-parse-html-region (point-min) (point-max))))
@@ -254,6 +245,9 @@ document.getElementsByTagName('head')[0].appendChild(meta);
                                     ('light nov-xwdiget-style-light)
                                     ('dark nov-xwdiget-style-dark)
                                     (_ nov-xwdiget-style-light))))
+                    (dom-append-child
+                     (dom-by-tag dom 'head)
+                     `(script nil ,nov-xwidget-script))
                     (setf (elt (car (dom-by-tag dom 'title)) 2) title)
                     dom))
          (file (with-temp-file output-native-path
@@ -380,7 +374,7 @@ Interactively, URL defaults to the string looking like a url around point."
                                           ('light nov-xwdiget-style-light)
                                           ('dark nov-xwdiget-style-dark)
                                           (_ nov-xwdiget-style-light)))
-                            (script nil ,nov-xwdiget-script)))
+                            (script nil ,nov-xwidget-script)))
                     dom))
          (file (with-temp-file html-path
                  (shr-dom-print new-dom)
