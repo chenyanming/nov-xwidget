@@ -1,6 +1,6 @@
 ;;; nov-xwidget.el --- nov-xwidget - the best epub reader in Emacs -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 Damon Chan
+;; Copyright (C) 2022 Damon Chan
 
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/nov-xwidget
