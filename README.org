@@ -3,12 +3,6 @@
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 
-* Table of Contents :TOC_3:noexport:
-- [[#introduction][Introduction]]
-- [[#features][Features]]
-- [[#installation-and-configuration][Installation and Configuration]]
-- [[#contributions][Contributions]]
-
 * Introduction
 =nov-xwidget= extends =nov.el= with the built-in xwidget webkit and render thes epub html/xhtml
 files with any CSS styles or JavaScript scripts.
