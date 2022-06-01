@@ -1,0 +1,43 @@
+#+TITLE:   nov-xwidget - the best epub reader in Emacs
+#+DATE:    June 1, 2022
+#+SINCE:   <replace with next tagged release version>
+#+STARTUP: inlineimages nofold
+
+* Table of Contents :TOC_3:noexport:
+- [[#introduction][Introduction]]
+- [[#features][Features]]
+- [[#installation-and-configuration][Installation and Configuration]]
+- [[#contributions][Contributions]]
+
+* Introduction
+=nov-xwidget= extends =nov.el= with the built-in xwidget webkit and render thes epub html/xhtml
+files with any CSS styles or JavaScript scripts.
+
+* Features
+- Render the epub with any CSS or JavaScript scripts, including but not limited to fonts,
+  layout etc.
+- Support dark or light mode
+
+
+* Installation and Configuration
+#+begin_src org
+(use-package nov-xwidget
+  :demand t
+  :after nov
+  :config
+  (map! :map xwidget-webkit-mode-map
+        :n "]" 'nov-xwidget-next-document
+        :n "[" 'nov-xwidget-previous-document
+        :n "gt" 'nov-xwidget-goto-toc)
+  (map! :map nov-mode-map
+        :n "gv" 'nov-xwidget-view))
+#+end_src
+
+Three options for you to configure:
+- =nov-xwdiget-script=
+- =nov-xwdiget-style-light=
+- =nov-xwdiget-style-dark=
+
+* Contributions
+I need your helps on adding more advanced styles or scripts. Adding more features to make Emacs
+as the best epub reader!
