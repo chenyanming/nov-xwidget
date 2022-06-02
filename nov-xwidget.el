@@ -210,34 +210,60 @@ console.log(\"Hello world\");
   :group 'nov-xwidget
   :type 'string)
 
-(defun nov-xwidget-webkit-find-file (candidate &optional arg new-session)
-  "Open file with webkit."
-  (interactive
-   (list
-    (pcase major-mode
-      ('nov-mode
-       (cdr (aref nov-documents nov-documents-index)))
-      (_
-       (read-file-name "Webkit find file: ")))
-    current-prefix-arg))
-  (let* ((native-path (expand-file-name (if (eq major-mode 'calibredb-search-mode)
-                                            (calibredb-get-file-path candidate t)
-                                          candidate)))
+
+(defcustom nov-xwidget-debug nil
+  "Enable the debug feature."
+  :group 'nov-xwidget
+  :type 'directory)
+
+(defcustom nov-xwidget-inject-output-dir
+  (expand-file-name (concat user-emacs-directory ".cache/nov-xwidget/"))
+  "The nov-xwidget injected output html directory when
+`nov-xwidget-debug' is t."
+  :group 'nov-xwidget
+  :type 'directory)
+
+(defun nov-xwidget-inject (file)
+  "Inject `nov-xwidget-script', `nov-xwdiget-style-light', or `nov-xwdiget-style-dark' into FILE.
+Input FILE should be  htm/html/xhtml
+Output a new html file prefix by _."
+  (when nov-xwidget-debug
+    ;; create the nov-xwidget-inject-output-dir if not exists
+    (unless (file-exists-p nov-xwidget-inject-output-dir)
+      (make-directory nov-xwidget-inject-output-dir)) )
+  (let* ((native-path file)
          ;; only work on html/xhtml file, rename xhtml as html
-         (output-native-file-name (if (or (string-equal (file-name-extension native-path) "html")
+         ;; we need to save to a new html file, because the original file may be read only
+         ;; saving to new html file is easier to tweak
+         (output-native-file-name (if (or (string-equal (file-name-extension native-path) "htm")
+                                          (string-equal (file-name-extension native-path) "html")
                                           (string-equal (file-name-extension native-path) "xhtml"))
                                       (format "_%s.html" (file-name-base native-path))
                                     (file-name-nondirectory native-path)))
          ;; get full path of the final html file
-         (output-native-path (expand-file-name output-native-file-name (file-name-directory native-path)))
+         (output-native-path (expand-file-name output-native-file-name (if nov-xwidget-debug
+                                                                           nov-xwidget-inject-output-dir
+                                                                           (file-name-directory native-path) )))
          ;; create the html if not esists, insert the `nov-xwidget-script' as the html script
          (dom (with-temp-buffer
-                 (insert-file-contents native-path)
-                 (libxml-parse-html-region (point-min) (point-max))))
+                (insert-file-contents native-path)
+                (libxml-parse-html-region (point-min) (point-max))))
          (title (format "%s: %s" (alist-get 'title nov-metadata)
                         (dom-text (or (dom-by-tag dom 'title)
                                       (dom-by-tag dom 'docTitle)))))
          (new-dom (let ((dom dom))
+                    ;; fix all href and point to the new html file
+                    (cl-map 'list (lambda(x)
+                                    (let* ((href (dom-attr x 'href))
+                                           (new-href (format "%s_%s.%s"
+                                                             (or (file-name-directory href) "")
+                                                             (file-name-base href)
+                                                             (replace-regexp-in-string
+                                                              "x?html?"
+                                                              "html"
+                                                              (file-name-extension href)))))
+                                      (dom-set-attribute x 'href new-href)))
+                            (dom-elements dom 'href ".*htm.*"))
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      '(meta ((charset . "utf-8"))))
@@ -253,18 +279,33 @@ console.log(\"Hello world\");
                     (let ((title-dom (or (dom-by-tag dom 'title) (dom-by-tag dom 'docTitle))))
                       (if title-dom
                           (setf (elt (car title-dom) 2) title)))
-                    dom))
-         (file (with-temp-file output-native-path
-                 (shr-dom-print new-dom)
-                 ;; (encode-coding-region (point-min) (point-max) 'utf-8)
-                 output-native-path))
+                    dom)))
+    (with-temp-file output-native-path
+      (shr-dom-print new-dom)
+      ;; (encode-coding-region (point-min) (point-max) 'utf-8)
+      output-native-path)))
+
+(defun nov-xwidget-webkit-find-file (candidate &optional arg new-session)
+  "Open file with webkit."
+  (interactive
+   (list
+    (pcase major-mode
+      ('nov-mode
+       (cdr (aref nov-documents nov-documents-index)))
+      (_
+       (read-file-name "Webkit find file: ")))
+    current-prefix-arg))
+  (let* ((file (nov-xwidget-inject
+                (expand-file-name (if (eq major-mode 'calibredb-search-mode)
+                                      (calibredb-get-file-path candidate t)
+                                    candidate))))
          ;; get web url of the file
          (path (replace-regexp-in-string
-               " "
-               "%20"
-               (concat
-                "file:///"
-                file))))
+                " "
+                "%20"
+                (concat
+                 "file:///"
+                 file))))
     (if arg
         (let ((calibredb-preferred-format nil))
           (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
