@@ -228,7 +228,7 @@ console.log(\"Hello world\");
 (defvar nov-xwidget-header-function #'nov-xwidget-header
   "Function that returns the string to be used for the nov xwidget header.")
 
-(define-derived-mode nov-xwidget-mode xwidget-webkit-mode "nov-xwidget"
+(define-derived-mode nov-xwidget-mode xwidget-webkit-mode "EPUB"
   "Major mode for listing calibre entries.
 \\{calibredb-search-mode-map}"
   (setq header-line-format '(:eval (funcall nov-xwidget-header-function)))
