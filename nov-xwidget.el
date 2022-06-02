@@ -234,7 +234,9 @@ console.log(\"Hello world\");
          (dom (with-temp-buffer
                  (insert-file-contents native-path)
                  (libxml-parse-html-region (point-min) (point-max))))
-         (title (format "%s: %s" (alist-get 'title nov-metadata) (dom-text (dom-by-tag dom 'title))))
+         (title (format "%s: %s" (alist-get 'title nov-metadata)
+                        (dom-text (or (dom-by-tag dom 'title)
+                                      (dom-by-tag dom 'docTitle)))))
          (new-dom (let ((dom dom))
                     (dom-append-child
                      (dom-by-tag dom 'head)
@@ -248,7 +250,9 @@ console.log(\"Hello world\");
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      `(script nil ,nov-xwidget-script))
-                    (setf (elt (car (dom-by-tag dom 'title)) 2) title)
+                    (let ((title-dom (or (dom-by-tag dom 'title) (dom-by-tag dom 'docTitle))))
+                      (if title-dom
+                          (setf (elt (car title-dom) 2) title)))
                     dom))
          (file (with-temp-file output-native-path
                  (shr-dom-print new-dom)
