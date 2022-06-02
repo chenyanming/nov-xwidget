@@ -389,4 +389,4 @@ Interactively, URL defaults to the string looking like a url around point."
       (setq-local nov-epub-version epub))))
 
 (provide 'nov-xwidget)
-;;; nov-xwidget ends here
+;;; nov-xwidget.el ends here
