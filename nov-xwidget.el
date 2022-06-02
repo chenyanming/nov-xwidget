@@ -223,6 +223,16 @@ console.log(\"Hello world\");
   :group 'nov-xwidget
   :type 'directory)
 
+(defun nov-xwidget-fix-file-path (file)
+  "Fix the FILE path by prefix _."
+  (format "%s_%s.%s"
+          (or (file-name-directory file) "")
+          (file-name-base file)
+          (replace-regexp-in-string
+           "x?html?"
+           "html"
+           (file-name-extension file))))
+
 (defun nov-xwidget-inject (file)
   "Inject `nov-xwidget-script', `nov-xwdiget-style-light', or `nov-xwdiget-style-dark' into FILE.
 Input FILE should be  htm/html/xhtml
@@ -255,15 +265,15 @@ Output a new html file prefix by _."
                     ;; fix all href and point to the new html file
                     (cl-map 'list (lambda(x)
                                     (let* ((href (dom-attr x 'href))
-                                           (new-href (format "%s_%s.%s"
-                                                             (or (file-name-directory href) "")
-                                                             (file-name-base href)
-                                                             (replace-regexp-in-string
-                                                              "x?html?"
-                                                              "html"
-                                                              (file-name-extension href)))))
+                                           (new-href (nov-xwidget-fix-file-path href)))
                                       (dom-set-attribute x 'href new-href)))
-                            (dom-elements dom 'href ".*htm.*"))
+                            ;; all elements that not start with http or https,
+                            ;; but matches htm.*
+                            (remove-if
+                             (lambda(x)
+                               (string-match-p "https?.*"
+                                               (dom-attr x 'href)))
+                             (dom-elements dom 'href ".*htm.*")))
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      '(meta ((charset . "utf-8"))))
@@ -285,6 +295,21 @@ Output a new html file prefix by _."
       ;; (encode-coding-region (point-min) (point-max) 'utf-8)
       output-native-path)))
 
+(defun nov-xwidget-inject-all-files()
+  "Inject `nov-xwdiget-style-dark', `nov-xwdiget-style-light', or
+`nov-xwdiget-script' to all files in `nov-documents'. It should
+be run once after the epub file is opened, so that it can fix all
+the href and generate new injected-htmls beforehand. You could
+also run it after modifing `nov-xwdiget-style-dark',
+`nov-xwdiget-style-light', or `nov-xwdiget-script'."
+  (if nov-documents
+      (dolist (document (append nov-documents nil))
+        ;; inject all files
+        (nov-xwidget-inject (cdr document))
+        ;; fix the path
+        ;; (setf (cdr document) (nov-xwidget-fix-file-path (cdr document)))
+        )))
+
 (defun nov-xwidget-webkit-find-file (candidate &optional arg new-session)
   "Open file with webkit."
   (interactive
@@ -295,6 +320,7 @@ Output a new html file prefix by _."
       (_
        (read-file-name "Webkit find file: ")))
     current-prefix-arg))
+  ;; every time to open a file, force inject, so that the scripts are reloaded
   (let* ((file (nov-xwidget-inject
                 (expand-file-name (if (eq major-mode 'calibredb-search-mode)
                                       (calibredb-get-file-path candidate t)
@@ -403,7 +429,8 @@ Interactively, URL defaults to the string looking like a url around point."
          (html-path (expand-file-name "toc.html" (file-name-directory path)))
          (html (if (file-exists-p html-path)
                    (with-temp-buffer (insert-file-contents html-path) (buffer-string))
-                 (nov-ncx-to-html path)))
+                 (if (string-empty-p (nov-ncx-to-html path))
+                     (with-temp-buffer (insert-file-contents path) (buffer-string)))))
          (dom (with-temp-buffer
                 (if ncxp
                     (insert html)

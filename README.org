@@ -4,9 +4,9 @@
 #+STARTUP: inlineimages nofold
 
 * Introduction
-=nov-xwidget= extends [[https://depp.brause.cc/nov.el/][nov.el]] with the built-in xwidget webkit (Compile Emacs with xwidget
-support) and render the epub html/xhtml files with any customized CSS styles or JavaScript
-scripts.
+=nov-xwidget= extends [[https://depp.brause.cc/nov.el/][nov.el]] with the built-in xwidget webkit (You have to compile Emacs with
+xwidget support) and render the epub html/xhtml files with any customized CSS styles or
+JavaScript scripts.
 
 * Features
 - Render epub with any CSS or JavaScript scripts, including but not limited to fonts, layout
@@ -25,13 +25,16 @@ scripts.
         :n "[" 'nov-xwidget-previous-document
         :n "gt" 'nov-xwidget-goto-toc)
   (map! :map nov-mode-map
-        :n "gv" 'nov-xwidget-view))
+        :n "gv" 'nov-xwidget-view)
+  (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 #+end_src
 
 Three options for you to configure:
 - =nov-xwidget-script=
 - =nov-xwidget-style-light=
 - =nov-xwidget-style-dark=
+
+Open an epub file in Emacs, then =M-x nov-xwidget-view=
 
 * Contributions
 I need your helps on adding more advanced styles or scripts. Adding more features to make Emacs
