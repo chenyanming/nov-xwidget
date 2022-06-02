@@ -223,6 +223,33 @@ console.log(\"Hello world\");
   :group 'nov-xwidget
   :type 'directory)
 
+(defvar nov-xwidget-current-file nil)
+
+(defvar nov-xwidget-header-function #'nov-xwidget-header
+  "Function that returns the string to be used for the nov xwidget header.")
+
+(define-derived-mode nov-xwidget-mode xwidget-webkit-mode "nov-xwidget"
+  "Major mode for listing calibre entries.
+\\{calibredb-search-mode-map}"
+  (setq header-line-format '(:eval (funcall nov-xwidget-header-function)))
+  ;; (add-hook 'minibuffer-setup-hook #'calibredb-search--minibuffer-setup)
+
+  )
+
+(defun nov-xwidget-header ()
+  "Return the string to be used as the nov-xwidget header. "
+  (let* ((file nov-xwidget-current-file)
+         (dom (with-temp-buffer
+                (insert-file-contents file)
+                (libxml-parse-html-region (point-min) (point-max)))))
+    (format "%s %d   %s %s   %s %s"
+            (propertize "Index:" 'face 'font-lock-preprocessor-face)
+            nov-documents-index
+            (propertize "Title:" 'face 'font-lock-preprocessor-face)
+            (alist-get 'title nov-metadata)
+            (propertize "Author:" 'face 'font-lock-preprocessor-face)
+            (alist-get 'creator nov-metadata))))
+
 (defun nov-xwidget-fix-file-path (file)
   "Fix the FILE path by prefix _."
   (format "%s_%s.%s"
@@ -258,9 +285,7 @@ Output a new html file prefix by _."
          (dom (with-temp-buffer
                 (insert-file-contents native-path)
                 (libxml-parse-html-region (point-min) (point-max))))
-         (title (format "%s: %s" (alist-get 'title nov-metadata)
-                        (dom-text (or (dom-by-tag dom 'title)
-                                      (dom-by-tag dom 'docTitle)))))
+         (title (format "%s" (alist-get 'title nov-metadata)))
          (new-dom (let ((dom dom))
                     ;; fix all href and point to the new html file
                     (cl-map 'list (lambda(x)
@@ -335,7 +360,15 @@ also run it after modifing `nov-xwdiget-style-dark',
     (if arg
         (let ((calibredb-preferred-format nil))
           (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
-      (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))))
+      (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
+    (setq-local nov-xwidget-current-file file)
+    (unless (eq major-mode 'nov-xwidget-mode)
+      (nov-xwidget-mode))))
+
+(defun nov-xwidget-find-source-file ()
+  "Open the source file."
+  (interactive nil xwidget-webkit-mode)
+  (find-file (cdr (aref nov-documents nov-documents-index))))
 
 (defun nov-xwidget-webkit-browse-url-other-window (url &optional new-session switch-buffer-fun)
   "Ask xwidget-webkit to browse URL.
@@ -365,10 +398,11 @@ Interactively, URL defaults to the string looking like a url around point."
          (index nov-documents-index)
          (toc nov-toc-id)
          (epub nov-epub-version)
-         (metadata nov-metadata))
+         (metadata nov-metadata)
+         (file (cdr (aref docs index))))
 
     ;; open the html file
-    (nov-xwidget-webkit-find-file (cdr (aref docs index)) nil t)
+    (nov-xwidget-webkit-find-file file nil t)
     ;; save nov related local variables
     (with-current-buffer (xwidget-buffer (xwidget-webkit-current-session))
       (setq-local nov-documents docs)
@@ -377,7 +411,10 @@ Interactively, URL defaults to the string looking like a url around point."
       (setq-local nov-epub-version epub)
       (setq-local nov-metadata metadata)
       ;(setq-local imenu-create-index-function 'my-nov-imenu-create-index)
-      )))
+      )
+    ;; save the file to `nox-xwidget-current-file', so that the header can parse
+    (setq-local nov-xwidget-current-file file)
+    ))
 
 (defun nov-xwidget-next-document ()
   "Go to the next document and render it."
