@@ -242,13 +242,16 @@ console.log(\"Hello world\");
          (dom (with-temp-buffer
                 (insert-file-contents file)
                 (libxml-parse-html-region (point-min) (point-max)))))
-    (format "%s %d   %s %s   %s %s"
+    (format "%s %d/%d   %s %s   %s %s   %s %s"
             (propertize "Index:" 'face 'font-lock-preprocessor-face)
             nov-documents-index
+            (1- (length nov-documents))
             (propertize "Title:" 'face 'font-lock-preprocessor-face)
             (alist-get 'title nov-metadata)
             (propertize "Author:" 'face 'font-lock-preprocessor-face)
-            (alist-get 'creator nov-metadata))))
+            (or (alist-get 'creator nov-metadata) "")
+            (propertize "Date:" 'face 'font-lock-preprocessor-face)
+            (alist-get 'date nov-metadata))))
 
 (defun nov-xwidget-fix-file-path (file)
   "Fix the FILE path by prefix _."
