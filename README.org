@@ -43,9 +43,9 @@ Open an epub file in Emacs, then =M-x nov-xwidget-view= to change to xwidget web
 | =xwidget-webkit-back=       | Back                   |
 | =xwidget-webkit-back=       | Forward                |
 | =nov-xwidget-goto-toc=      | Goto table of contents |
-| nov-xwidget-next-document | Goto next document     |
-| nov-xwidget-next-document | Goto previous document |
+| =nov-xwidget-next-document= | Goto next document     |
+| =nov-xwidget-next-document= | Goto previous document |
 
 * Contributions
-I need your helps on adding more advanced styles or scripts. Adding more features to make Emacs
+I need your helps on adding more advanced styles or scripts. Add more features and make Emacs
 as the best epub reader!
