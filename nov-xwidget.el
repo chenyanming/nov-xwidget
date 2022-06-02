@@ -429,24 +429,25 @@ Interactively, URL defaults to the string looking like a url around point."
          (html-path (expand-file-name "toc.html" (file-name-directory path)))
          (html (if (file-exists-p html-path)
                    (with-temp-buffer (insert-file-contents html-path) (buffer-string))
-                 (if (string-empty-p (nov-ncx-to-html path))
-                     (with-temp-buffer (insert-file-contents path) (buffer-string)))))
+                 ;; it could be empty sting
+                 (nov-ncx-to-html path)))
          (dom (with-temp-buffer
                 (if ncxp
                     (insert html)
                   (insert-file-contents path))
                 (libxml-parse-html-region (point-min) (point-max))))
          (new-dom (let ((dom dom))
-                    (dom-add-child-before
-                     dom
-                     `(head nil
-                            (meta ((charset . "utf-8")))
-                            (title nil "TOC")
-                            (style nil ,(pcase (frame-parameter nil 'background-mode)
-                                          ('light nov-xwdiget-style-light)
-                                          ('dark nov-xwdiget-style-dark)
-                                          (_ nov-xwdiget-style-light)))
-                            (script nil ,nov-xwidget-script)))
+                    (if dom
+                        (dom-add-child-before
+                         dom
+                         `(head nil
+                                (meta ((charset . "utf-8")))
+                                (title nil "TOC")
+                                (style nil ,(pcase (frame-parameter nil 'background-mode)
+                                              ('light nov-xwdiget-style-light)
+                                              ('dark nov-xwdiget-style-dark)
+                                              (_ nov-xwdiget-style-light)))
+                                (script nil ,nov-xwidget-script))) )
                     dom))
          (file (with-temp-file html-path
                  (shr-dom-print new-dom)
