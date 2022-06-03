@@ -357,8 +357,8 @@ also run it after modifing `nov-xwdiget-style-dark',
         ;; (setf (cdr document) (nov-xwidget-fix-file-path (cdr document)))
         )))
 
-(defun nov-xwidget-webkit-find-file (candidate &optional arg new-session)
-  "Open epub file with xwidget webkit."
+(defun nov-xwidget-webkit-find-file (file &optional arg new-session)
+  "Open a FILE with xwidget webkit."
   (interactive
    (list
     (pcase major-mode
@@ -368,7 +368,7 @@ also run it after modifing `nov-xwdiget-style-dark',
        (read-file-name "Webkit find file: ")))
     current-prefix-arg))
   ;; every time to open a file, force inject, so that the scripts are reloaded
-  (let* ((file (nov-xwidget-inject candidate))
+  (let* ((file (nov-xwidget-inject file))
          ;; get web url of the file
          (path (replace-regexp-in-string
                 " "
@@ -379,7 +379,7 @@ also run it after modifing `nov-xwdiget-style-dark',
     (nov-xwidget-webkit-browse-url-other-window
      (if (string-equal (file-name-extension file) "ncx")
          "about:blank"
-       path ) new-session 'switch-to-buffer)
+       path) new-session 'switch-to-buffer)
     (setq-local nov-xwidget-current-file file)
     (unless (eq major-mode 'nov-xwidget-webkit-mode)
       (nov-xwidget-webkit-mode))))
