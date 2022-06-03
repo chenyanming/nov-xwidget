@@ -368,10 +368,7 @@ also run it after modifing `nov-xwdiget-style-dark',
        (read-file-name "Webkit find file: ")))
     current-prefix-arg))
   ;; every time to open a file, force inject, so that the scripts are reloaded
-  (let* ((file (nov-xwidget-inject
-                (expand-file-name (if (eq major-mode 'calibredb-search-mode)
-                                      (calibredb-get-file-path candidate t)
-                                    candidate))))
+  (let* ((file (nov-xwidget-inject candidate))
          ;; get web url of the file
          (path (replace-regexp-in-string
                 " "
@@ -379,10 +376,10 @@ also run it after modifing `nov-xwdiget-style-dark',
                 (concat
                  "file:///"
                  file))))
-    (if arg
-        (let ((calibredb-preferred-format nil))
-          (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
-      (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
+    (nov-xwidget-webkit-browse-url-other-window
+     (if (string-equal (file-name-extension file) "ncx")
+         "about:blank"
+       path ) new-session 'switch-to-buffer)
     (setq-local nov-xwidget-current-file file)
     (unless (eq major-mode 'nov-xwidget-webkit-mode)
       (nov-xwidget-webkit-mode))))
