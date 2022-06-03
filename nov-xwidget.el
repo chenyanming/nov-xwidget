@@ -228,13 +228,30 @@ console.log(\"Hello world\");
 (defvar nov-xwidget-header-function #'nov-xwidget-header
   "Function that returns the string to be used for the nov xwidget header.")
 
-(define-derived-mode nov-xwidget-mode xwidget-webkit-mode "EPUB"
-  "Major mode for listing calibre entries.
-\\{calibredb-search-mode-map}"
-  (setq header-line-format '(:eval (funcall nov-xwidget-header-function)))
-  ;; (add-hook 'minibuffer-setup-hook #'calibredb-search--minibuffer-setup)
+(define-derived-mode nov-xwidget-webkit-mode xwidget-webkit-mode "EPUB"
+  "Major mode for reading epub files.
+\\{nov-xwidget-webkit-mode-map}"
+  (setq header-line-format '(:eval (funcall nov-xwidget-header-function))))
 
-  )
+(defvar nov-xwidget-webkit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "n" #'nov-xwidget-next-document)
+    (define-key map "p" #'nov-xwidget-previous-document)
+    (define-key map "]" #'nov-xwidget-next-document)
+    (define-key map "[" #'nov-xwidget-previous-document)
+    (define-key map "t" #'nov-xwidget-goto-toc)
+    (define-key map "S" #'nov-xwidget-find-source-file)
+    map)
+  "Keymap for `nov-xwidget-webkit-mode-map'.")
+
+(if (featurep 'evil)
+    (evil-define-key '(normal emacs) nov-xwidget-webkit-mode-map
+      (kbd "n") 'nov-xwidget-next-document
+      (kbd "p") 'nov-xwidget-previous-document
+      (kbd "]") 'nov-xwidget-xwidget-next-document
+      (kbd "[") 'nov-xwidget-previous-document
+      (kbd "t") 'nov-xwidget-goto-toc
+      (kbd "S") 'nov-xwidget-find-source-file))
 
 (defun nov-xwidget-header ()
   "Return the string to be used as the nov-xwidget header. "
@@ -330,6 +347,7 @@ be run once after the epub file is opened, so that it can fix all
 the href and generate new injected-htmls beforehand. You could
 also run it after modifing `nov-xwdiget-style-dark',
 `nov-xwdiget-style-light', or `nov-xwdiget-script'."
+  (interactive)
   (if nov-documents
       (dolist (document (append nov-documents nil))
         ;; inject all files
@@ -365,8 +383,8 @@ also run it after modifing `nov-xwdiget-style-dark',
           (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
       (nov-xwidget-webkit-browse-url-other-window path new-session 'switch-to-buffer))
     (setq-local nov-xwidget-current-file file)
-    (unless (eq major-mode 'nov-xwidget-mode)
-      (nov-xwidget-mode))))
+    (unless (eq major-mode 'nov-xwidget-webkit-mode)
+      (nov-xwidget-webkit-mode))))
 
 (defun nov-xwidget-find-source-file ()
   "Open the source file."

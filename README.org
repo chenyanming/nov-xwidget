@@ -20,10 +20,6 @@ JavaScript scripts.
   :demand t
   :after nov
   :config
-  (map! :map xwidget-webkit-mode-map
-        :n "]" 'nov-xwidget-next-document
-        :n "[" 'nov-xwidget-previous-document
-        :n "gt" 'nov-xwidget-goto-toc)
   (map! :map nov-mode-map
         :n "gv" 'nov-xwidget-view)
   (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
@@ -38,13 +34,15 @@ Three options for you to configure:
 * Usage
 Open an epub file in Emacs, then =M-x nov-xwidget-view= to change to xwidget webkit buffer.
 
-| Function                  | Feature                |
-|---------------------------+------------------------|
-| =xwidget-webkit-back=       | Back                   |
-| =xwidget-webkit-back=       | Forward                |
-| =nov-xwidget-goto-toc=      | Goto table of contents |
-| =nov-xwidget-next-document= | Goto next document     |
-| =nov-xwidget-next-document= | Goto previous document |
+| Function                     | Feature                                               |
+|------------------------------+-------------------------------------------------------|
+| =xwidget-webkit-back=          | Back                                                  |
+| =xwidget-webkit-forward=       | Forward                                               |
+| =nov-xwidget-goto-toc=         | Goto table of contents                                |
+| =nov-xwidget-next-document=    | Goto next document                                    |
+| =nov-xwidget-next-document=    | Goto previous document                                |
+| =nov-xwidget-find-source-file= | Goto the original source file                         |
+| =nov-xwidget-inject-all-files= | Apply styles and scripts to all documents in one epub |
 
 * Contributions
 I need your helps on adding more advanced styles or scripts. Add more features and make Emacs
