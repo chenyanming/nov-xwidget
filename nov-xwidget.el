@@ -31,6 +31,7 @@
 (require 'nov)
 (require 'shr)
 (require 'xwidget)
+(require 'cl-lib)
 
 (defcustom nov-xwidget-script (format "
 console.log(\"Hello world\");
@@ -314,7 +315,7 @@ Output a new html file prefix by _."
                                       (dom-set-attribute x 'href new-href)))
                             ;; all elements that not start with http or https,
                             ;; but matches htm.*
-                            (remove-if
+                            (cl-remove-if
                              (lambda(x)
                                (string-match-p "https?.*"
                                                (dom-attr x 'href)))
