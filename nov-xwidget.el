@@ -248,7 +248,7 @@ console.log(\"Hello world\");
     (evil-define-key '(normal emacs) nov-xwidget-webkit-mode-map
       (kbd "n") 'nov-xwidget-next-document
       (kbd "p") 'nov-xwidget-previous-document
-      (kbd "]") 'nov-xwidget-xwidget-next-document
+      (kbd "]") 'nov-xwidget-next-document
       (kbd "[") 'nov-xwidget-previous-document
       (kbd "t") 'nov-xwidget-goto-toc
       (kbd "S") 'nov-xwidget-find-source-file))
@@ -357,7 +357,7 @@ also run it after modifing `nov-xwdiget-style-dark',
         )))
 
 (defun nov-xwidget-webkit-find-file (candidate &optional arg new-session)
-  "Open file with webkit."
+  "Open epub file with xwidget webkit."
   (interactive
    (list
     (pcase major-mode
