@@ -375,14 +375,19 @@ also run it after modifing `nov-xwdiget-style-dark',
                 "%20"
                 (concat
                  "file:///"
-                 file))))
-    (nov-xwidget-webkit-browse-url-other-window
-     (if (string-equal (file-name-extension file) "ncx")
-         "about:blank"
-       path) new-session 'switch-to-buffer)
-    (setq-local nov-xwidget-current-file file)
-    (unless (eq major-mode 'nov-xwidget-webkit-mode)
-      (nov-xwidget-webkit-mode))))
+                 file)))
+         (final-path (if (string-equal (file-name-extension file) "ncx")
+                         "about:blank"
+                       path)))
+    ;; workaround to view in windows
+    ;; TODO it is able to support to browse in external browser
+    ;; after supporting more advance html/style/scripts
+    (if (eq system-type 'windows-nt)
+        (browse-url final-path)
+      (nov-xwidget-webkit-browse-url-other-window final-path new-session 'switch-to-buffer)
+      (setq-local nov-xwidget-current-file file)
+      (unless (eq major-mode 'nov-xwidget-webkit-mode)
+        (nov-xwidget-webkit-mode)))))
 
 (defun nov-xwidget-find-source-file ()
   "Open the source file."
