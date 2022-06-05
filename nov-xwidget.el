@@ -41,7 +41,7 @@ console.log(\"Hello world\");
   :type 'string)
 
 
-(defcustom nov-xwdiget-style-light (format "
+(defcustom nov-xwidget-style-light (format "
     body {
         writing-mode: horizontal-tb;
         // background: %s !important;
@@ -124,7 +124,7 @@ console.log(\"Hello world\");
   :type 'string)
 
 
-(defcustom nov-xwdiget-style-dark (format "
+(defcustom nov-xwidget-style-dark (format "
     body {
         writing-mode: horizontal-tb;
         // background: %s !important;
@@ -282,7 +282,7 @@ console.log(\"Hello world\");
            (file-name-extension file))))
 
 (defun nov-xwidget-inject (file)
-  "Inject `nov-xwidget-script', `nov-xwdiget-style-light', or `nov-xwdiget-style-dark' into FILE.
+  "Inject `nov-xwidget-script', `nov-xwidget-style-light', or `nov-xwidget-style-dark' into FILE.
 Input FILE should be  htm/html/xhtml
 Output a new html file prefix by _."
   (when nov-xwidget-debug
@@ -326,9 +326,9 @@ Output a new html file prefix by _."
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      `(style nil ,(pcase (frame-parameter nil 'background-mode)
-                                    ('light nov-xwdiget-style-light)
-                                    ('dark nov-xwdiget-style-dark)
-                                    (_ nov-xwdiget-style-light))))
+                                    ('light nov-xwidget-style-light)
+                                    ('dark nov-xwidget-style-dark)
+                                    (_ nov-xwidget-style-light))))
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      `(script nil ,nov-xwidget-script))
@@ -342,12 +342,12 @@ Output a new html file prefix by _."
       output-native-path)))
 
 (defun nov-xwidget-inject-all-files()
-  "Inject `nov-xwdiget-style-dark', `nov-xwdiget-style-light', or
-`nov-xwdiget-script' to all files in `nov-documents'. It should
+  "Inject `nov-xwidget-style-dark', `nov-xwidget-style-light', or
+`nov-xwidget-script' to all files in `nov-documents'. It should
 be run once after the epub file is opened, so that it can fix all
 the href and generate new injected-htmls beforehand. You could
-also run it after modifing `nov-xwdiget-style-dark',
-`nov-xwdiget-style-light', or `nov-xwdiget-script'."
+also run it after modifing `nov-xwidget-style-dark',
+`nov-xwidget-style-light', or `nov-xwidget-script'."
   (interactive)
   (if nov-documents
       (dolist (document (append nov-documents nil))
@@ -505,9 +505,9 @@ Interactively, URL defaults to the string looking like a url around point."
                                 (meta ((charset . "utf-8")))
                                 (title nil "TOC")
                                 (style nil ,(pcase (frame-parameter nil 'background-mode)
-                                              ('light nov-xwdiget-style-light)
-                                              ('dark nov-xwdiget-style-dark)
-                                              (_ nov-xwdiget-style-light)))
+                                              ('light nov-xwidget-style-light)
+                                              ('dark nov-xwidget-style-dark)
+                                              (_ nov-xwidget-style-light)))
                                 (script nil ,nov-xwidget-script))) )
                     dom))
          (file (with-temp-file html-path
