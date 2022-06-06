@@ -224,8 +224,7 @@ alternative browser function."
 
 (defcustom nov-xwidget-inject-output-dir
   (expand-file-name (concat user-emacs-directory ".cache/nov-xwidget/"))
-  "The nov-xwidget injected output html directory when
-`nov-xwidget-debug' is t."
+  "The nov-xwidget injected output html directory."
   :group 'nov-xwidget
   :type 'directory)
 
@@ -287,8 +286,9 @@ alternative browser function."
            "html"
            (file-name-extension file))))
 
-(defun nov-xwidget-inject (file)
+(defun nov-xwidget-inject (file &optional callback)
   "Inject `nov-xwidget-script', `nov-xwidget-style-light', or `nov-xwidget-style-dark' into FILE.
+Call CALLBACK on the final injected dom.
 Input FILE should be  htm/html/xhtml
 Output a new html file prefix by _."
   (when nov-xwidget-debug
@@ -307,7 +307,7 @@ Output a new html file prefix by _."
          ;; get full path of the final html file
          (output-native-path (expand-file-name output-native-file-name (if nov-xwidget-debug
                                                                            nov-xwidget-inject-output-dir
-                                                                           (file-name-directory native-path) )))
+                                                                         (setq nov-xwidget-inject-output-dir (file-name-directory native-path)))))
          ;; create the html if not esists, insert the `nov-xwidget-script' as the html script
          (dom (with-temp-buffer
                 (insert-file-contents native-path)
@@ -338,6 +338,8 @@ Output a new html file prefix by _."
                      (dom-by-tag dom 'head)
                      `(script nil ,nov-xwidget-script))
                     dom)))
+    (if callback
+        (funcall callback new-dom))
     (with-temp-file output-native-path
       (shr-dom-print new-dom)
       ;; (encode-coding-region (point-min) (point-max) 'utf-8)
