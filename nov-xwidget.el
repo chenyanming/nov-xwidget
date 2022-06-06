@@ -312,7 +312,6 @@ Output a new html file prefix by _."
          (dom (with-temp-buffer
                 (insert-file-contents native-path)
                 (libxml-parse-html-region (point-min) (point-max))))
-         (title (format "%s" (alist-get 'title nov-metadata)))
          (new-dom (let ((dom dom))
                     ;; fix all href and point to the new html file
                     (cl-map 'list (lambda(x)
@@ -338,9 +337,6 @@ Output a new html file prefix by _."
                     (dom-append-child
                      (dom-by-tag dom 'head)
                      `(script nil ,nov-xwidget-script))
-                    (let ((title-dom (or (dom-by-tag dom 'title) (dom-by-tag dom 'docTitle))))
-                      (if title-dom
-                          (setf (elt (car title-dom) 2) title)))
                     dom)))
     (with-temp-file output-native-path
       (shr-dom-print new-dom)
