@@ -12,7 +12,8 @@ JavaScript scripts.
 - Render epub with any CSS or JavaScript scripts, including but not limited to fonts, layout
   etc.
 - Support dark or light mode
-
+- For some systems that can not use xwidget, set =nov-xwidget-browser-function= to other browser
+  functions, e.g. =browse-url=.
 
 * Installation and Configuration
 #+begin_src org
