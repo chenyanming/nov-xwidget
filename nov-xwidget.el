@@ -211,6 +211,11 @@ console.log(\"Hello world\");
   :group 'nov-xwidget
   :type 'string)
 
+(defcustom nov-xwidget-browser-function 'nov-xwidget-webkit-browse-url-other-window
+  "TODO: xwidget may not work in some systems, set it to an
+alternative browser function."
+  :group 'nov-xwidget
+  :type browse-url--browser-defcustom-type)
 
 (defcustom nov-xwidget-debug nil
   "Enable the debug feature."
@@ -382,12 +387,13 @@ also run it after modifing `nov-xwidget-style-dark',
     ;; workaround to view in windows
     ;; TODO it is able to support to browse in external browser
     ;; after supporting more advance html/style/scripts
-    (if (eq system-type 'windows-nt)
-        (browse-url final-path)
+    (cond
+     ((eq nov-xwidget-browser-function 'nov-xwidget-webkit-browse-url-other-window)
       (nov-xwidget-webkit-browse-url-other-window final-path new-session 'switch-to-buffer)
       (setq-local nov-xwidget-current-file file)
       (unless (eq major-mode 'nov-xwidget-webkit-mode)
-        (nov-xwidget-webkit-mode)))))
+        (nov-xwidget-webkit-mode)))
+     (t (funcall nov-xwidget-browser-function final-path)))))
 
 (defun nov-xwidget-find-source-file ()
   "Open the source file."
@@ -428,17 +434,16 @@ Interactively, URL defaults to the string looking like a url around point."
     ;; open the html file
     (nov-xwidget-webkit-find-file file nil t)
     ;; save nov related local variables
-    (with-current-buffer (xwidget-buffer (xwidget-webkit-current-session))
-      (setq-local nov-documents docs)
-      (setq-local nov-documents-index index)
-      (setq-local nov-toc-id toc)
-      (setq-local nov-epub-version epub)
-      (setq-local nov-metadata metadata)
-      ;(setq-local imenu-create-index-function 'my-nov-imenu-create-index)
-      )
-    ;; save the file to `nox-xwidget-current-file', so that the header can parse
-    (setq-local nov-xwidget-current-file file)
-    ))
+    (when (eq nov-xwidget-browser-function 'nov-xwidget-webkit-browse-url-other-window)
+      (with-current-buffer (xwidget-buffer (xwidget-webkit-current-session))
+        ;;(setq-local imenu-create-index-function 'my-nov-imenu-create-index)
+        (setq-local nov-documents docs)
+        (setq-local nov-documents-index index)
+        (setq-local nov-toc-id toc)
+        (setq-local nov-epub-version epub)
+        (setq-local nov-metadata metadata))
+      ;; save the file to `nox-xwidget-current-file', so that the header can parse
+      (setq-local nov-xwidget-current-file file))))
 
 (defun nov-xwidget-next-document ()
   "Go to the next document and render it."
