@@ -9,6 +9,8 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "28.1") (nov "0.4.0"))
 
+;; This file is NOT part of GNU Emacs.
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -260,7 +262,7 @@ alternative browser function."
           (kbd "S") 'nov-xwidget-find-source-file)))
 
 (defun nov-xwidget-header ()
-  "Return the string to be used as the nov-xwidget header. "
+  "Return the string to be used as the nov-xwidget header."
   (let* ((file nov-xwidget-current-file)
          (dom (with-temp-buffer
                 (insert-file-contents file)
