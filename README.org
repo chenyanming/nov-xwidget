@@ -21,8 +21,7 @@ JavaScript scripts.
   :demand t
   :after nov
   :config
-  (map! :map nov-mode-map
-        :n "gv" 'nov-xwidget-view)
+  (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
   (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 #+end_src
 
