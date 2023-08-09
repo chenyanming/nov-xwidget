@@ -527,5 +527,23 @@ Interactively, URL defaults to the string looking like a url around point."
       (setq-local nov-toc-id toc)
       (setq-local nov-epub-version epub))))
 
+; Window size change functions; this arrangement below is not ideal, as it basically replicates the code in xwidget-webkit.el, which changes the size of the xwidget *if* the window's mode is xwidget-webkit-mode.
+; In the future, xwidget-webkit should accomodate generalized "windows containing a webkit instance" rather than just xwidget-webkit-mode specifically for this.
+
+(defun nov-xwidget-webkit-auto-adjust-size (window)
+  "Adjust the size of the webkit widget in the given nov-webkit WINDOW."
+  (with-current-buffer (window-buffer window)
+    (when (eq major-mode 'nov-xwidget-webkit-mode)
+      (let ((xwidget (xwidget-webkit-current-session)))
+        (xwidget-webkit-adjust-size-to-window xwidget window)))))
+
+(defun nov-xwidget-webkit-adjust-size-in-frame (frame)
+  "Dynamically adjust webkit widget for all nov-webkit windows of the FRAME."
+  (walk-windows 'nov-xwidget-webkit-auto-adjust-size 'no-minibuf frame))
+
+(eval-after-load 'nov-xwidget-webkit-mode
+  (add-to-list 'window-size-change-functions
+               'nov-xwidget-webkit-adjust-size-in-frame))
+
 (provide 'nov-xwidget)
 ;;; nov-xwidget.el ends here
