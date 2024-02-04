@@ -40,7 +40,7 @@ Open an epub file in Emacs, then =M-x nov-xwidget-view= to change to xwidget web
 | =xwidget-webkit-forward=       | Forward                                               |
 | =nov-xwidget-goto-toc=         | Goto table of contents                                |
 | =nov-xwidget-next-document=    | Goto next document                                    |
-| =nov-xwidget-next-document=    | Goto previous document                                |
+| =nov-xwidget-previous-document=    | Goto previous document                                |
 | =nov-xwidget-find-source-file= | Goto the original source file                         |
 | =nov-xwidget-inject-all-files= | Apply styles and scripts to all documents in one epub |
 
