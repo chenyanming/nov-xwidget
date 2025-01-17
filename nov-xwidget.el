@@ -219,7 +219,7 @@ alternative browser function."
   :type browse-url--browser-defcustom-type)
 
 (defcustom nov-xwidget-inject-output-dir
-  (expand-file-name (concat temporary-file-directory ".cache/nov-xwidget/"))
+  (expand-file-name (concat temporary-file-directory "nov-xwidget/"))
   "The nov-xwidget injected output html directory."
   :group 'nov-xwidget
   :type 'directory)
@@ -289,7 +289,7 @@ Input FILE should be  htm/html/xhtml
 Output a new html file prefix by _."
   ;; create the nov-xwidget-inject-output-dir if not exists
   (unless (file-exists-p nov-xwidget-inject-output-dir)
-    (make-directory nov-xwidget-inject-output-dir))
+    (make-directory nov-xwidget-inject-output-dir t))
   (let* ((native-path file)
          ;; only work on html/xhtml file, rename xhtml as html
          ;; we need to save to a new html file, because the original file may be read only
