@@ -218,13 +218,8 @@ alternative browser function."
   :group 'nov-xwidget
   :type browse-url--browser-defcustom-type)
 
-(defcustom nov-xwidget-debug nil
-  "Enable the debug feature."
-  :group 'nov-xwidget
-  :type 'directory)
-
 (defcustom nov-xwidget-inject-output-dir
-  (expand-file-name (concat user-emacs-directory ".cache/nov-xwidget/"))
+  (expand-file-name (concat temporary-file-directory ".cache/nov-xwidget/"))
   "The nov-xwidget injected output html directory."
   :group 'nov-xwidget
   :type 'directory)
@@ -292,10 +287,9 @@ alternative browser function."
 Call CALLBACK on the final injected dom.
 Input FILE should be  htm/html/xhtml
 Output a new html file prefix by _."
-  (when nov-xwidget-debug
-    ;; create the nov-xwidget-inject-output-dir if not exists
-    (unless (file-exists-p nov-xwidget-inject-output-dir)
-      (make-directory nov-xwidget-inject-output-dir)) )
+  ;; create the nov-xwidget-inject-output-dir if not exists
+  (unless (file-exists-p nov-xwidget-inject-output-dir)
+    (make-directory nov-xwidget-inject-output-dir))
   (let* ((native-path file)
          ;; only work on html/xhtml file, rename xhtml as html
          ;; we need to save to a new html file, because the original file may be read only
@@ -306,9 +300,7 @@ Output a new html file prefix by _."
                                       (format "_%s.html" (file-name-base native-path))
                                     (file-name-nondirectory native-path)))
          ;; get full path of the final html file
-         (output-native-path (expand-file-name output-native-file-name (if nov-xwidget-debug
-                                                                           nov-xwidget-inject-output-dir
-                                                                         (setq nov-xwidget-inject-output-dir (file-name-directory native-path)))))
+         (output-native-path (expand-file-name output-native-file-name nov-xwidget-inject-output-dir))
          ;; create the html if not esists, insert the `nov-xwidget-script' as the html script
          (dom (with-temp-buffer
                 (insert-file-contents native-path)
